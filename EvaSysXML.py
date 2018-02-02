@@ -2,11 +2,15 @@
 
 import os, glob, sys, getopt
 from glob import iglob
+import requests
+from urllib.parse import urlparse, urlencode
 from xml.etree import ElementTree
 from xml.dom import minidom
 import pandas as pd
 import unicodedata
 import re
+import datetime
+import getpass
 
 def usage():
 	print('EvaSysXML.py --convert-to-html -split-by-<ID or ORG> -k <single --ID or --ORG> -i <HISLSF_XML> -o <filename>')
@@ -144,6 +148,36 @@ def process_XML(convert_format, convert, split_format, split_keys, split, input_
 			EvaSys_df.to_html(os.path.splitext(output_file)[0] + '.html', justify="center")
 		
 	print(".. EvaSysXML finished.")
+	
+def download_XML(semester):
+	# See https://uvweb.uni-muenster.de/lsf/xml/index.php
+	url = 'https://uvweb.uni-muenster.de/lsf/xml/evasys.php'
+	now = datetime.datetime.now()
+	filename = "LSFExport-"+semester+"-"+now.strftime("%Y-%m-%d")+".xml"
+
+	print("Download semester: " + semester)
+	print("Save XML data in: " + filename)
+	
+	if os.path.isfile(filename) and not os.stat(filename).st_size == 0:
+		print("Skip download and use existing file!")
+		return filename
+		
+	print("Enter your username and password for WWU Münster!")
+	username = input("Username: ")
+	password = getpass.getpass("Password for " + username + ": ")
+	
+	r = requests.post(url, data={'semester':semester}, auth=(username,password), stream=True)
+	if r.status_code == 200:
+		with open(filename, 'wb') as out:
+			for bits in r.iter_content(chunk_size=1024):
+				if bits:
+					out.write(bits)
+	
+	if os.stat(filename).st_size == 0:
+		print("Server error. Try again!")
+		sys.exit(3)
+		
+	return filename
 
 if __name__ == "__main__":
 
@@ -155,14 +189,17 @@ if __name__ == "__main__":
 	split = False
 	input_file = ''
 	output_file = ''
+	semester = ''
 
 	try:
-		opts, args = getopt.getopt(argv,"k:i:o:",["convert-to-html","ID=","ORG=","input=","output=","split-by-ID","split-by-ORG"])
+		opts, args = getopt.getopt(argv,"k:i:o:",["download-semester=", "convert-to-html","ID=","ORG=","input=","output=","split-by-ID","split-by-ORG"])
 	except getopt.GetoptError:
 		usage()
 		
 	for opt, arg in opts:
-		if opt in ("--convert-to-html"):
+		if opt in ("--download-semester"):
+			semester = arg
+		elif opt in ("--convert-to-html"):
 			convert_format = "html"
 			convert = True
 		elif opt in ("--split-by-ID"):
@@ -179,10 +216,16 @@ if __name__ == "__main__":
 		elif opt in ("-o", "--output"):
 			output_file = arg
 			
-	if not input_file:
-		usage()
-			
-	if not convert and not split:
+	if not input_file and not semester:
 		usage()
 		
-	process_XML(convert_format, convert, split_format, split_keys, split, input_file, output_file)
+	if input_file and semester:
+		usage()
+			
+	if semester:
+		input_file = download_XML(semester)
+	
+	if convert or split:
+		process_XML(convert_format, convert, split_format, split_keys, split, input_file, output_file)
+	else:
+		usage()

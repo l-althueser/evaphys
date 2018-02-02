@@ -1,6 +1,12 @@
 # Split and convert HISLSF XML export for EvaSys
 
-This repository contains several python3 scripts to convert or split XML files exported from the WWU Münster HISLSF system. 
+This repository contains several python3 scripts to convert or split XML files exported from the WWU Münster HISLSF system.
+
+## Get newest XML data
+```
+python EvaSysXML.py --download-semester 20181
+```
+The `-i *.xml` parameter can be replaced by `--download-semester 20181` in the following!
 
 ## Convert XML to HTML list
 ```
