@@ -8,25 +8,25 @@ python EvaSysXML.py --download-semester 20181
 ```
 The `-i *.xml` parameter can be replaced by `--download-semester 20181` in the following!
 
-## Convert XML to HTML list
+## Convert XML to html, csv or excel
 ```
-python EvaSysXML.py --convert-to-html -i HISLSF-Export.xml
-```
-
-## Split and convert XML by event number
-```
-python EvaSysXML.py --convert-to-html --split-by-ID -i HISLSF-Export.xml
-```
-For a single department:
-```
-python EvaSysXML.py --convert-to-html --split-by-ID -k 11 -i HISLSF-Export.xml
+python EvaSysXML.py --convert-to html -i HISLSF-Export.xml
+python EvaSysXML.py --convert-to csv -i HISLSF-Export.xml
+python EvaSysXML.py --convert-to excel -i HISLSF-Export.xml
 ```
 
-## Split and convert XML by organization
+## Filter by event type
 ```
-python EvaSysXML.py --convert-to-html --split-by-ORG -i HISLSF-Export.xml
+python EvaSysXML.py --filter-type Vorlesung,V/Ü,"Grundkurs Vorlesung",Standardvorlesung,Vorlesung/Praktikum,Ringvorlesung,Vorlesung/Seminar -i HISLSF-Export.xml
 ```
-For a single department:
+
+## Split and convert XML by event number or organization
 ```
-python EvaSysXML.py --convert-to-html --split-by-ORG -k "Institut für Musikpädagogik" -i HISLSF-Export.xml
+python EvaSysXML.py --convert-to html --split-by ID  -i HISLSF-Export.xml
+python EvaSysXML.py --convert-to html --split-by ORG -i HISLSF-Export.xml
+```
+For a single department or organization:
+```
+python EvaSysXML.py --convert-to html --ID 11 -i HISLSF-Export.xml
+python EvaSysXML.py --convert-to html --ORG "Institut für Musikpädagogik" -i HISLSF-Export.xml
 ```
