@@ -39,15 +39,17 @@ def iter_docs(Evasys):
 			lastname = ''
 			email = ''
 			for node in [x for x in Evasys.findall('Person') if x.attrib['key'] == doz_key][0].getiterator():
+				xstr = lambda s: '' if s is None else str(s)
 				if node.tag == "title":
-					title = str(node.text)
+					title = xstr(node.text)
 				if node.tag == "firstname":
-					firstname = str(node.text)
+					firstname = xstr(node.text)
 				if node.tag == "lastname":
-					lastname = str(node.text)
+					lastname = xstr(node.text)
 				if node.tag == "email":
-					email = str(node.text)
-			dozs.append(" ".join([title,firstname,lastname,"("+email+")"]))
+					email = xstr(node.text)
+			# write dozs formatted as: "John Smith" <johnsemail@hisserver.com>
+			dozs.append('"'+" ".join(filter(None, [title,firstname,lastname]))+'"'+" <"+email+">")
 		Lecture_dict["dozs"] = ", ".join(dozs)
 			
 		Lecture_dict.update(Lecture.attrib)
@@ -177,7 +179,14 @@ def process_XML(convert_format, split_format, split_keys, filter_type, input_fil
 				elif convert_format == "csv":
 					EvaSys_df.to_csv(output_file_split+'.csv', sep=";", index=False)
 				elif convert_format == "excel":
-					EvaSys_df.to_excel(output_file_split+'.xlsx', index=False)
+					with pd.ExcelWriter(output_file_split+'.xlsx', engine='xlsxwriter') as writer:
+						EvaSys_df.to_excel(writer, index=False, sheet_name='HISLSF-Export')
+						worksheet = writer.sheets['HISLSF-Export']
+						worksheet.set_column('C:C', 25, None)
+						worksheet.set_column('D:D', 12, None)
+						worksheet.set_column('E:E', 45, None)
+						worksheet.set_column('F:F', 25, None)
+						worksheet.set_column('G:G', 14, None)
 				
 	else:
 		if convert_format:
@@ -196,7 +205,14 @@ def process_XML(convert_format, split_format, split_keys, filter_type, input_fil
 			elif convert_format == "csv":
 				EvaSys_df.to_csv(os.path.splitext(output_file)[0]+'.csv', sep=";", index=False)
 			elif convert_format == "excel":
-				EvaSys_df.to_excel(os.path.splitext(output_file)[0]+'.xlsx', index=False)
+				with pd.ExcelWriter(os.path.splitext(output_file)[0]+'.xlsx', engine='xlsxwriter') as writer:
+					EvaSys_df.to_excel(writer, index=False, sheet_name='HISLSF-Export')
+					worksheet = writer.sheets['HISLSF-Export']
+					worksheet.set_column('C:C', 25, None)
+					worksheet.set_column('D:D', 12, None)
+					worksheet.set_column('E:E', 45, None)
+					worksheet.set_column('F:F', 25, None)
+					worksheet.set_column('G:G', 14, None)
 		
 	print("")
 	print("==== EvaSysXML finished ====")
