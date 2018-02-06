@@ -56,14 +56,6 @@ def iter_docs(Evasys):
 		if Lecture_dict["name"]:
 			yield Lecture_dict
 
-def prettify(elem):
-	"""Return a pretty-printed XML string for the Element.
-	"""
-	rough_string = ElementTree.tostring(elem, 'utf-8')
-	reparsed = minidom.parseString(rough_string)
-	#return reparsed.toprettyxml(indent="  ", encoding="UTF-8")
-	return '\n'.join([line for line in reparsed.toprettyxml(indent=' '*2, encoding="UTF-8").decode('utf8').split('\n') if line.strip()])
-
 def slugify(value):
     """
     Converts to lowercase, removes non-word characters (alphanumerics and
@@ -166,7 +158,11 @@ def process_XML(convert_format, split_format, split_keys, filter_type, input_fil
 					EvaSys.remove(Person)
 
 			with open(output_file_split+'.xml', mode='w') as f:
-				f.write(prettify(EvaSys))
+				header = '<?xml version="1.0" encoding="UTF-8"?>\n'
+				rough_string = ElementTree.tostring(EvaSys, encoding='utf-8', method='html').decode("utf-8") 
+				#reparsed = minidom.parseString(ElementTree.tostring(EvaSys, encoding='utf-8'))
+				#rough_string = '\n'.join([line for line in reparsed.toprettyxml(indent=' '*2, encoding="UTF-8").decode('utf-8').split('\n') if line.strip()])
+				f.write(header + rough_string)
 				
 			if convert_format:
 				EvaSys_df = pd.DataFrame(list(iter_docs(EvaSys)))
