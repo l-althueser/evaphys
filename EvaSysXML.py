@@ -230,13 +230,13 @@ def download_XML(semester):
 	
 	r = requests.post(url, data={'semester':semester}, auth=(username,password), stream=True)
 	if r.status_code == 200:
-		with codecs.open(filename, 'wb', encoding="utf-8") as out:
+		with open(filename, 'wb') as out:
 			for bits in r.iter_content(chunk_size=1024):
 				if bits:
 					out.write(bits)
 	
-	if os.stat(filename).st_size == 0:
-		print("Server error. Try again!")
+	if not os.path.isfile(filename) or os.stat(filename).st_size == 0:
+		print("Error (Server or User/Password). Try again!")
 		sys.exit(3)
 		
 	return filename
