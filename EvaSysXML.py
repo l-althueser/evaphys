@@ -11,6 +11,7 @@ import unicodedata
 import re
 import datetime
 import getpass
+import codecs
 
 def usage():
 	print('EvaSysXML.py --download-semester <20181> --convert-to <html, csv or excel> --split-by <ID or ORG> --ID <single ID e.g. 11> --ORG <single ORG> --filter-type <Vorlesung,V/Ü> -o <filename>')
@@ -157,12 +158,9 @@ def process_XML(convert_format, split_format, split_keys, filter_type, input_fil
 				if not Person.attrib['key'] in dozs_keys:
 					EvaSys.remove(Person)
 
-			with open(output_file_split+'.xml', mode='w') as f:
-				header = '<?xml version="1.0" encoding="UTF-8"?>\n'
-				rough_string = ElementTree.tostring(EvaSys, encoding='utf-8', method='html').decode("utf-8") 
-				#reparsed = minidom.parseString(ElementTree.tostring(EvaSys, encoding='utf-8'))
-				#rough_string = '\n'.join([line for line in reparsed.toprettyxml(indent=' '*2, encoding="UTF-8").decode('utf-8').split('\n') if line.strip()])
-				f.write(header + rough_string)
+			with codecs.open(output_file_split+'.xml', mode='w', encoding="utf-8") as f:
+				f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
+				f.write(ElementTree.tostring(EvaSys, encoding='utf-8', method='html').decode("utf-8"))
 				
 			if convert_format:
 				EvaSys_df = pd.DataFrame(list(iter_docs(EvaSys)))
@@ -232,7 +230,7 @@ def download_XML(semester):
 	
 	r = requests.post(url, data={'semester':semester}, auth=(username,password), stream=True)
 	if r.status_code == 200:
-		with open(filename, 'wb') as out:
+		with codecs.open(filename, 'wb', encoding="utf-8") as out:
 			for bits in r.iter_content(chunk_size=1024):
 				if bits:
 					out.write(bits)
