@@ -17,7 +17,7 @@ python EvaSysXML.py --convert-to excel -i HISLSF-Export.xml
 
 ## Filter by event type
 ```
-python EvaSysXML.py --filter-type Vorlesung,V/Ü,"Grundkurs Vorlesung",Standardvorlesung,Vorlesung/Praktikum,Ringvorlesung,Vorlesung/Seminar -i HISLSF-Export.xml
+python EvaSysXML.py --include-type Vorlesung,V/Ü,"Grundkurs Vorlesung",Standardvorlesung,Vorlesung/Praktikum,Ringvorlesung,Vorlesung/Seminar -i HISLSF-Export.xml
 ```
 
 ## Split and convert XML by event number or organization
@@ -29,4 +29,9 @@ For a single department or organization:
 ```
 python EvaSysXML.py --convert-to html --ID 11 -i HISLSF-Export.xml
 python EvaSysXML.py --convert-to html --ORG "Institut für Musikpädagogik" -i HISLSF-Export.xml
+```
+
+## For FB11
+```
+python EvaSysXML.py --download-semester 20181 --convert-to excel --remove-duplicates --ID 11 --exclude-type Kolloquium,Forschungsseminar,"Anleitung zum wissenschaftlichen Arbeiten",Exkursion,Vorkurs,Tutorium,Übung,Workshop,Alle,Einführung,Reservierung
 ```
